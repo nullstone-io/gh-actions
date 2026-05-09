@@ -1,0 +1,23 @@
+name: deploy-app
+author: nullstone-io
+description: Deploy a Nullstone app via `nullstone deploy`
+branding:
+  icon: send
+  color: blue
+inputs:
+  app:
+    required: true
+    description: Nullstone app name
+  env:
+    required: true
+    description: Target Nullstone environment
+runs:
+  using: composite
+  steps:
+    - uses: nullstone-io/setup-nullstone-action@v0
+    - name: Deploy ${{ inputs.app }}
+      shell: bash
+      env:
+        NULLSTONE_APP: ${{ inputs.app }}
+        NULLSTONE_ENV: ${{ inputs.env }}
+      run: nullstone deploy

@@ -1,0 +1,33 @@
+name: deploy-and-run
+author: nullstone-io
+description: Deploy a Nullstone app and execute a command on it via `nullstone run`
+branding:
+  icon: play
+  color: blue
+inputs:
+  app:
+    required: true
+    description: Nullstone app to deploy
+  command:
+    required: true
+    description: Command passed to `nullstone run --app=<app>` after deployment
+  env:
+    required: true
+    description: Target Nullstone environment
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+    - uses: nullstone-io/setup-nullstone-action@v0
+    - name: Deploy ${{ inputs.app }}
+      shell: bash
+      env:
+        NULLSTONE_ENV: ${{ inputs.env }}
+        NULLSTONE_APP: ${{ inputs.app }}
+      run: nullstone deploy --app=${{ inputs.app }}
+    - name: Run command
+      shell: bash
+      env:
+        NULLSTONE_ENV: ${{ inputs.env }}
+        NULLSTONE_APP: ${{ inputs.app }}
+      run: nullstone run --app=${{ inputs.app }} ${{ inputs.command }}

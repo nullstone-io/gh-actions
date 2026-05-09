@@ -1,0 +1,20 @@
+name: iac-sync
+author: nullstone-io
+description: Run `nullstone iac-sync` for a target environment
+branding:
+  icon: refresh-cw
+  color: blue
+inputs:
+  env:
+    required: true
+    description: Target Nullstone environment
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+    - uses: nullstone-io/setup-nullstone-action@v0
+    - name: Sync IaC
+      shell: bash
+      env:
+        NULLSTONE_ENV: ${{ inputs.env }}
+      run: nullstone iac-sync

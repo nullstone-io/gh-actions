@@ -1,0 +1,49 @@
+name: build-publish-docker-app
+author: nullstone-io
+description: Build and publish a single Nullstone app container image
+branding:
+  icon: package
+  color: blue
+inputs:
+  app:
+    required: true
+    description: Nullstone app name (also used as the image tag)
+  dockerfile:
+    required: true
+    description: Path to the Dockerfile
+  context:
+    required: false
+    default: '.'
+    description: Docker build context
+  build-args:
+    required: false
+    default: ''
+    description: Newline-separated KEY=VALUE pairs passed as --build-arg
+  env:
+    required: true
+    description: Target Nullstone environment
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+      with:
+        ref: ${{ github.sha }}
+    - uses: docker/setup-buildx-action@v3
+    - uses: nullstone-io/setup-nullstone-action@v0
+    - uses: docker/build-push-action@v6
+      with:
+        context: ${{ inputs.context }}
+        file: ${{ inputs.dockerfile }}
+        push: false
+        load: true
+        tags: ${{ inputs.app }}
+        provenance: false
+        build-args: ${{ inputs.build-args }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    - name: Publish to Nullstone
+      shell: bash
+      env:
+        NULLSTONE_ENV: ${{ inputs.env }}
+        NULLSTONE_APP: ${{ inputs.app }}
+      run: nullstone push --source=${{ inputs.app }} --app=${{ inputs.app }}
