@@ -5,9 +5,15 @@ branding:
   icon: package
   color: blue
 inputs:
+  stack:
+    required: false
+    description: Nullstone stack name (falls back to NULLSTONE_STACK env var)
   app:
-    required: true
-    description: Nullstone app name (also used as the image tag)
+    required: false
+    description: Nullstone app name, also used as the image tag (falls back to NULLSTONE_APP env var)
+  env:
+    required: false
+    description: Nullstone environment name (falls back to NULLSTONE_ENV env var)
   dockerfile:
     required: true
     description: Path to the Dockerfile
@@ -19,9 +25,14 @@ inputs:
     required: false
     default: ''
     description: Newline-separated KEY=VALUE pairs passed as --build-arg
-  env:
-    required: true
-    description: Target Nullstone environment
+  version:
+    required: false
+    default: ''
+    description: Label for the deployment (defaults to the commit SHA of the current repo)
+  unique:
+    required: false
+    default: 'false'
+    description: Always push the artifact with a unique version; appends an incrementing -<count> suffix if the version already exists
 runs:
   using: composite
   steps:
@@ -30,13 +41,15 @@ runs:
         ref: ${{ github.sha }}
     - uses: docker/setup-buildx-action@v3
     - uses: nullstone-io/setup-nullstone-action@v0
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
     - uses: docker/build-push-action@v6
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.dockerfile }}
         push: false
         load: true
-        tags: ${{ inputs.app }}
+        tags: ${{ inputs.app || env.NULLSTONE_APP }}
         provenance: false
         build-args: ${{ inputs.build-args }}
         cache-from: type=gha
@@ -44,6 +57,13 @@ runs:
     - name: Publish to Nullstone
       shell: bash
       env:
-        NULLSTONE_ENV: ${{ inputs.env }}
-        NULLSTONE_APP: ${{ inputs.app }}
-      run: nullstone push --source=${{ inputs.app }} --app=${{ inputs.app }}
+        NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
+        NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
+        NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
+        VERSION: ${{ inputs.version }}
+        UNIQUE: ${{ inputs.unique }}
+      run: |
+        flags=(--source="$NULLSTONE_APP")
+        [ -n "$VERSION" ] && flags+=(--version "$VERSION")
+        [ "$UNIQUE" = "true" ] && flags+=(--unique)
+        nullstone push "${flags[@]}"

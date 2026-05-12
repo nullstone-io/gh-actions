@@ -5,9 +5,20 @@ branding:
   icon: refresh-cw
   color: blue
 inputs:
+  stack:
+    required: false
+    description: Nullstone stack name (falls back to NULLSTONE_STACK env var)
   env:
-    required: true
-    description: Target Nullstone environment
+    required: false
+    description: Target Nullstone environment (falls back to NULLSTONE_ENV env var)
+  auto-plan:
+    required: false
+    default: 'false'
+    description: Queue an infra-update Run on each workspace where IaC changes are detected (Run is left pending approval)
+  auto-apply:
+    required: false
+    default: 'false'
+    description: Auto-approve any infra-update Run created by the sync (implies --auto-plan)
 runs:
   using: composite
   steps:
@@ -16,5 +27,12 @@ runs:
     - name: Sync IaC
       shell: bash
       env:
-        NULLSTONE_ENV: ${{ inputs.env }}
-      run: nullstone iac-sync
+        NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
+        NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
+        AUTO_PLAN: ${{ inputs.auto-plan }}
+        AUTO_APPLY: ${{ inputs.auto-apply }}
+      run: |
+        flags=()
+        [ "$AUTO_PLAN" = "true" ] && flags+=(--auto-plan)
+        [ "$AUTO_APPLY" = "true" ] && flags+=(--auto-apply)
+        nullstone iac sync "${flags[@]}"

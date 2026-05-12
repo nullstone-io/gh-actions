@@ -5,29 +5,52 @@ branding:
   icon: play
   color: blue
 inputs:
+  stack:
+    required: false
+    description: Nullstone stack name (falls back to NULLSTONE_STACK env var)
   app:
-    required: true
-    description: Nullstone app to deploy
+    required: false
+    description: Nullstone app to deploy (falls back to NULLSTONE_APP env var)
+  env:
+    required: false
+    description: Target Nullstone environment (falls back to NULLSTONE_ENV env var)
   command:
     required: true
-    description: Command passed to `nullstone run --app=<app>` after deployment
-  env:
-    required: true
-    description: Target Nullstone environment
+    description: Command passed to `nullstone run` after deployment
+  container:
+    required: false
+    default: ''
+    description: Select a specific container within a task or pod (passed as --container)
+  env-vars:
+    required: false
+    default: ''
+    description: Newline-separated NAME=value pairs, each passed as --env-var to `nullstone run`
 runs:
   using: composite
   steps:
     - uses: actions/checkout@v6
     - uses: nullstone-io/setup-nullstone-action@v0
-    - name: Deploy ${{ inputs.app }}
+    - name: Deploy
       shell: bash
       env:
-        NULLSTONE_ENV: ${{ inputs.env }}
-        NULLSTONE_APP: ${{ inputs.app }}
-      run: nullstone deploy --app=${{ inputs.app }}
+        NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
+        NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
+        NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
+      run: nullstone deploy
     - name: Run command
       shell: bash
       env:
-        NULLSTONE_ENV: ${{ inputs.env }}
-        NULLSTONE_APP: ${{ inputs.app }}
-      run: nullstone run --app=${{ inputs.app }} ${{ inputs.command }}
+        NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
+        NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
+        NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
+        CONTAINER: ${{ inputs.container }}
+        ENV_VARS: ${{ inputs.env-vars }}
+      run: |
+        flags=()
+        [ -n "$CONTAINER" ] && flags+=(--container "$CONTAINER")
+        if [ -n "$ENV_VARS" ]; then
+          while IFS= read -r line; do
+            [ -n "$line" ] && flags+=(--env-var "$line")
+          done <<< "$ENV_VARS"
+        fi
+        nullstone run "${flags[@]}" -- ${{ inputs.command }}

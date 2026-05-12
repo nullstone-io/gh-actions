@@ -8,6 +8,19 @@ inputs:
   dir:
     required: true
     description: Path (relative to repo root) where the module's source files live
+  version:
+    required: false
+    default: next-patch
+    description: |
+      Semver version for the module. Special values:
+      'next-patch' bumps the patch component of the latest module version;
+      'next-build' appends +<build> using the short Git commit SHA to the latest version.
+  if:
+    required: false
+    default: ''
+    description: |
+      Only publish when the condition is met. Supported:
+      'checksum-changed' skips publishing when the packaged tarball matches the latest published version.
 outputs:
   changed:
     description: '"true" if the module changed in the most recent commit, "false" otherwise'
@@ -39,4 +52,10 @@ runs:
       if: steps.changes.outputs.changed == 'true'
       working-directory: ${{ inputs.dir }}
       shell: bash
-      run: nullstone modules publish --version=next-patch
+      env:
+        VERSION: ${{ inputs.version }}
+        IF_CONDITION: ${{ inputs.if }}
+      run: |
+        flags=(--version="$VERSION")
+        [ -n "$IF_CONDITION" ] && flags+=(--if "$IF_CONDITION")
+        nullstone modules publish "${flags[@]}"

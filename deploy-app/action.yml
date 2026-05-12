@@ -5,19 +5,23 @@ branding:
   icon: send
   color: blue
 inputs:
+  stack:
+    required: false
+    description: Nullstone stack name (falls back to NULLSTONE_STACK env var)
   app:
-    required: true
-    description: Nullstone app name
+    required: false
+    description: Nullstone app name (falls back to NULLSTONE_APP env var)
   env:
-    required: true
-    description: Target Nullstone environment
+    required: false
+    description: Target Nullstone environment (falls back to NULLSTONE_ENV env var)
 runs:
   using: composite
   steps:
     - uses: nullstone-io/setup-nullstone-action@v0
-    - name: Deploy ${{ inputs.app }}
+    - name: Deploy
       shell: bash
       env:
-        NULLSTONE_APP: ${{ inputs.app }}
-        NULLSTONE_ENV: ${{ inputs.env }}
+        NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
+        NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
+        NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
       run: nullstone deploy
