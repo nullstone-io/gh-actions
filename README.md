@@ -9,6 +9,7 @@ Catalog of reusable composite GitHub Actions for assembling a Nullstone deploy p
 | [`publish-module`](publish-module/) | Publish a Nullstone IaC module if its source files changed in the most recent commit (exposes `changed` output) |
 | [`build-publish-docker-app`](build-publish-docker-app/) | Build a single app's container image with Buildx and push it to the Nullstone artifact registry |
 | [`iac-sync`](iac-sync/) | Run `nullstone iac-sync` for a target environment |
+| [`iac-test`](iac-test/) | Run `nullstone iac test` against a target environment (typically on pull requests) |
 | [`deploy-and-run`](deploy-and-run/) | Deploy a Nullstone app and execute a follow-up command (migrations, seeds, batch jobs) |
 | [`deploy-app`](deploy-app/) | Deploy a single Nullstone app via `nullstone deploy` |
 

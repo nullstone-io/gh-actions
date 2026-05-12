@@ -1,0 +1,26 @@
+name: iac-test
+author: nullstone-io
+description: Run `nullstone iac test` against a target environment
+branding:
+  icon: check-circle
+  color: blue
+inputs:
+  stack:
+    required: false
+    description: Nullstone stack name (falls back to NULLSTONE_STACK env var)
+  env:
+    required: false
+    description: Target Nullstone environment (falls back to NULLSTONE_ENV env var)
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+    - uses: nullstone-io/setup-nullstone-action@v0
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: IaC test
+      shell: bash
+      env:
+        NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
+        NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
+      run: nullstone iac test
