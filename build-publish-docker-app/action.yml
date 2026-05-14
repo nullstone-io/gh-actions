@@ -15,7 +15,8 @@ inputs:
     required: false
     description: Nullstone environment name (falls back to NULLSTONE_ENV env var)
   dockerfile:
-    required: true
+    required: false
+    default: 'Dockerfile'
     description: Path to the Dockerfile
   context:
     required: false
