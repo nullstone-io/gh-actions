@@ -12,6 +12,12 @@ Composite action that builds a single app's container image with Buildx and push
 | `build-args` | no | `''` | Newline-separated `KEY=VALUE` pairs passed as `--build-arg` |
 | `env` | yes | — | Target Nullstone environment |
 
+## Outputs
+
+| Output | Notes |
+| -- | -- |
+| `version` | Artifact version emitted by `nullstone push` on success |
+
 ## Environment
 
 Reads `NULLSTONE_ORG`, `NULLSTONE_STACK`, and `NULLSTONE_API_KEY` from the workflow environment. See the [top-level README](../README.md#consumer-convention) for the convention.

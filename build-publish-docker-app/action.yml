@@ -33,6 +33,10 @@ inputs:
     required: false
     default: 'false'
     description: Always push the artifact with a unique version; appends an incrementing -<count> suffix if the version already exists
+outputs:
+  version:
+    description: The artifact version emitted by `nullstone push` on success
+    value: ${{ steps.push.outputs.version }}
 runs:
   using: composite
   steps:
@@ -55,6 +59,7 @@ runs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
     - name: Publish to Nullstone
+      id: push
       shell: bash
       env:
         NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
@@ -63,7 +68,10 @@ runs:
         VERSION: ${{ inputs.version }}
         UNIQUE: ${{ inputs.unique }}
       run: |
+        set -euo pipefail
         flags=(--source="$NULLSTONE_APP")
         [ -n "$VERSION" ] && flags+=(--version "$VERSION")
         [ "$UNIQUE" = "true" ] && flags+=(--unique)
-        nullstone push "${flags[@]}"
+        version="$(nullstone push "${flags[@]}")"
+        printf '%s\n' "$version"
+        printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"

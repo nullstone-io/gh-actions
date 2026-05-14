@@ -13,6 +13,7 @@ Composite action that publishes a single Nullstone IaC module if its source file
 | Output | Notes |
 | -- | -- |
 | `changed` | `"true"` if the module's source files changed in `HEAD~1..HEAD`, `"false"` otherwise |
+| `version` | Module version emitted by `nullstone modules publish` on success (empty when the publish step is skipped) |
 
 ## Environment
 
