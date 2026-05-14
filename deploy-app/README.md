@@ -4,10 +4,11 @@ Composite action that deploys a single Nullstone app via `nullstone deploy`. Int
 
 ## Inputs
 
-| Input | Required | Notes |
-| -- | -- | -- |
-| `app` | yes | Nullstone app name |
-| `env` | yes | Target Nullstone environment |
+| Input | Required | Default | Notes |
+| -- | -- | -- | -- |
+| `app` | yes | — | Nullstone app name |
+| `env` | yes | — | Target Nullstone environment |
+| `wait` | no | `'false'` | When `'true'`, passes `--wait` to `nullstone deploy` so the step blocks until the deployment completes |
 
 ## Environment
 

@@ -14,6 +14,10 @@ inputs:
   env:
     required: false
     description: Target Nullstone environment (falls back to NULLSTONE_ENV env var)
+  wait:
+    required: false
+    default: 'false'
+    description: When 'true', pass --wait to `nullstone deploy` so the step blocks until the deployment completes
 runs:
   using: composite
   steps:
@@ -24,4 +28,8 @@ runs:
         NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
         NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
         NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
-      run: nullstone deploy
+        WAIT: ${{ inputs.wait }}
+      run: |
+        flags=()
+        [ "$WAIT" = "true" ] && flags+=(--wait)
+        nullstone deploy "${flags[@]}"
