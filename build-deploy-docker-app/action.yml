@@ -76,8 +76,9 @@ runs:
         flags=(--source="$NULLSTONE_APP")
         [ -n "$VERSION" ] && flags+=(--version "$VERSION")
         [ "$UNIQUE" = "true" ] && flags+=(--unique)
-        version="$(nullstone push "${flags[@]}")"
-        printf '%s\n' "$version"
+        output="$(nullstone push "${flags[@]}")"
+        printf '%s\n' "$output"
+        version="$(printf '%s' "$output" | tail -n1)"
         printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
     - name: Deploy
       shell: bash
