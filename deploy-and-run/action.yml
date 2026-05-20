@@ -24,7 +24,11 @@ inputs:
   env-vars:
     required: false
     default: ''
-    description: Newline-separated NAME=value pairs, each passed as --env-var to `nullstone run`
+    description: Newline-separated KEY=VALUE pairs, each passed as --env-var to the `nullstone deploy` step
+  run-env-vars:
+    required: false
+    default: ''
+    description: Newline-separated KEY=VALUE pairs, each passed as --env-var to the `nullstone run` step
 runs:
   using: composite
   steps:
@@ -36,7 +40,15 @@ runs:
         NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
         NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
         NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
-      run: nullstone deploy
+        ENV_VARS: ${{ inputs.env-vars }}
+      run: |
+        flags=()
+        if [ -n "$ENV_VARS" ]; then
+          while IFS= read -r line; do
+            [ -n "$line" ] && flags+=(--env-var="$line")
+          done <<< "$ENV_VARS"
+        fi
+        nullstone deploy "${flags[@]}"
     - name: Run command
       shell: bash
       env:
@@ -44,7 +56,7 @@ runs:
         NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
         NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
         CONTAINER: ${{ inputs.container }}
-        ENV_VARS: ${{ inputs.env-vars }}
+        ENV_VARS: ${{ inputs.run-env-vars }}
       run: |
         flags=()
         [ -n "$CONTAINER" ] && flags+=(--container "$CONTAINER")

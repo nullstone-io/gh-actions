@@ -18,6 +18,10 @@ inputs:
     required: false
     default: 'false'
     description: When 'true', pass --wait to `nullstone deploy` so the step blocks until the deployment completes
+  env-vars:
+    required: false
+    default: ''
+    description: Newline-separated KEY=VALUE pairs, each passed as --env-var to `nullstone deploy`
 runs:
   using: composite
   steps:
@@ -29,7 +33,13 @@ runs:
         NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
         NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
         WAIT: ${{ inputs.wait }}
+        ENV_VARS: ${{ inputs.env-vars }}
       run: |
         flags=()
         [ "$WAIT" = "true" ] && flags+=(--wait)
+        if [ -n "$ENV_VARS" ]; then
+          while IFS= read -r line; do
+            [ -n "$line" ] && flags+=(--env-var="$line")
+          done <<< "$ENV_VARS"
+        fi
         nullstone deploy "${flags[@]}"

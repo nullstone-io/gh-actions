@@ -9,6 +9,7 @@ Composite action that deploys a single Nullstone app via `nullstone deploy`. Int
 | `app` | yes | — | Nullstone app name |
 | `env` | yes | — | Target Nullstone environment |
 | `wait` | no | `'false'` | When `'true'`, passes `--wait` to `nullstone deploy` so the step blocks until the deployment completes |
+| `env-vars` | no | `''` | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to `nullstone deploy` |
 
 ## Environment
 
@@ -31,6 +32,20 @@ deploy:
       with:
         env: ${{ inputs.env }}
         app: ${{ matrix.app }}
+```
+
+Passing env vars to the deployment:
+
+```yaml
+steps:
+  - uses: nullstone-io/gh-actions/deploy-app@v1
+    with:
+      env: ${{ inputs.env }}
+      app: taco-api
+      env-vars: |
+        LOG_LEVEL=debug
+        FEATURE_FLAG=on
+        RELEASE_SHA=${{ github.sha }}
 ```
 
 ## Behavior

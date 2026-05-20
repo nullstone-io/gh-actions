@@ -9,6 +9,8 @@ Composite action that deploys a Nullstone app and then executes a follow-up comm
 | `app` | yes | Nullstone app to deploy |
 | `command` | yes | Command passed to `nullstone run --app=<app>` |
 | `env` | yes | Target Nullstone environment |
+| `env-vars` | no | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to the `nullstone deploy` step |
+| `run-env-vars` | no | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to the `nullstone run` step |
 
 ## Environment
 
@@ -41,6 +43,25 @@ seed:
         env: ${{ inputs.env }}
         app: taco-seeder
         command: seed all
+```
+
+Setting env vars. `env-vars` is applied to the `nullstone deploy` step, while `run-env-vars`
+is applied to the follow-up `nullstone run` step:
+
+```yaml
+db-migrate:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: nullstone-io/gh-actions/deploy-and-run@v1
+      with:
+        env: ${{ inputs.env }}
+        app: taco-migrations
+        command: migrate up
+        env-vars: |
+          LOG_LEVEL=debug
+          RELEASE_SHA=${{ github.sha }}
+        run-env-vars: |
+          MIGRATE_BATCH_SIZE=500
 ```
 
 ## Behavior

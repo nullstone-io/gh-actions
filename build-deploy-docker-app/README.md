@@ -14,6 +14,7 @@ Composite action that builds a single app's container image with Buildx, pushes 
 | `version` | no | `''` | Version label for the artifact (defaults to the commit SHA) |
 | `unique` | no | `'false'` | Always push with a unique version; appends `-<count>` if the version already exists |
 | `wait` | no | `'false'` | When `'true'`, passes `--wait` to `nullstone deploy` so the step blocks until the deployment completes |
+| `env-vars` | no | `''` | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to `nullstone deploy` |
 
 ## Outputs
 
@@ -48,6 +49,22 @@ build-deploy:
         app: ${{ matrix.app }}
         dockerfile: ${{ matrix.dockerfile }}
         build-args: ${{ matrix.build-args }}
+```
+
+Note that `build-args` are consumed at image build time, while `env-vars` are applied to the
+deployment. To set runtime env vars on the deploy:
+
+```yaml
+steps:
+  - uses: nullstone-io/gh-actions/build-deploy-docker-app@v1
+    with:
+      env: ${{ inputs.env }}
+      app: taco-api
+      dockerfile: ./Dockerfile
+      env-vars: |
+        LOG_LEVEL=debug
+        FEATURE_FLAG=on
+        RELEASE_SHA=${{ github.sha }}
 ```
 
 ## Behavior

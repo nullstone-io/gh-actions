@@ -38,6 +38,10 @@ inputs:
     required: false
     default: 'false'
     description: When 'true', pass --wait to `nullstone deploy` so the step blocks until the deployment completes
+  env-vars:
+    required: false
+    default: ''
+    description: Newline-separated KEY=VALUE pairs, each passed as --env-var to `nullstone deploy`
 outputs:
   version:
     description: The artifact version emitted by `nullstone push` on success
@@ -89,7 +93,13 @@ runs:
         NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
         VERSION: ${{ steps.push.outputs.version }}
         WAIT: ${{ inputs.wait }}
+        ENV_VARS: ${{ inputs.env-vars }}
       run: |
         flags=(--version "$VERSION")
         [ "$WAIT" = "true" ] && flags+=(--wait)
+        if [ -n "$ENV_VARS" ]; then
+          while IFS= read -r line; do
+            [ -n "$line" ] && flags+=(--env-var="$line")
+          done <<< "$ENV_VARS"
+        fi
         nullstone deploy "${flags[@]}"
