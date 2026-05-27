@@ -51,6 +51,8 @@ runs:
     - name: Set up Nullstone
       if: steps.changes.outputs.changed == 'true'
       uses: nullstone-io/setup-nullstone-action@v0
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
     - name: Publish ${{ inputs.dir }}
       id: publish
       if: steps.changes.outputs.changed == 'true'

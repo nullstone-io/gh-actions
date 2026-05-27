@@ -26,6 +26,8 @@ runs:
   using: composite
   steps:
     - uses: nullstone-io/setup-nullstone-action@v0
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
     - name: Deploy
       shell: bash
       env:
