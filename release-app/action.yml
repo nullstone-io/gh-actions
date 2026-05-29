@@ -1,0 +1,59 @@
+name: release-app
+author: nullstone-io
+description: Release a Nullstone app via `nullstone release` (infra-update + deploy)
+branding:
+  icon: send
+  color: blue
+inputs:
+  stack:
+    required: false
+    description: Nullstone stack name (falls back to NULLSTONE_STACK env var)
+  app:
+    required: false
+    description: Nullstone app name (falls back to NULLSTONE_APP env var)
+  env:
+    required: false
+    description: Target Nullstone environment (falls back to NULLSTONE_ENV env var)
+  version:
+    required: false
+    default: ''
+    description: Label for the release, passed as --version (defaults to the commit SHA of the current repo)
+  auto-approve:
+    required: false
+    default: 'false'
+    description: When 'true', pass --auto-approve to `nullstone release` to skip approvals on the infra-update (requires proper stack permissions)
+  wait:
+    required: false
+    default: 'false'
+    description: When 'true', pass --wait to `nullstone release` so the step blocks until the release completes
+  env-vars:
+    required: false
+    default: ''
+    description: Newline-separated KEY=VALUE pairs, each passed as --env-var to `nullstone release`
+runs:
+  using: composite
+  steps:
+    - uses: nullstone-io/setup-nullstone-action@v0
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: Release
+      shell: bash
+      env:
+        NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
+        NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
+        NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
+        VERSION: ${{ inputs.version }}
+        AUTO_APPROVE: ${{ inputs.auto-approve }}
+        WAIT: ${{ inputs.wait }}
+        ENV_VARS: ${{ inputs.env-vars }}
+      run: |
+        flags=()
+        [ -n "$VERSION" ] && flags+=(--version "$VERSION")
+        [ "$AUTO_APPROVE" = "true" ] && flags+=(--auto-approve)
+        [ "$WAIT" = "true" ] && flags+=(--wait)
+        if [ -n "$ENV_VARS" ]; then
+          while IFS= read -r line; do
+            [ -n "$line" ] && flags+=(--env-var="$line")
+          done <<< "$ENV_VARS"
+        fi
+        nullstone release "${flags[@]}"

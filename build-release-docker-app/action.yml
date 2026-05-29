@@ -1,0 +1,111 @@
+name: build-release-docker-app
+author: nullstone-io
+description: Build, publish, and release a single Nullstone app container image
+branding:
+  icon: rocket
+  color: blue
+inputs:
+  stack:
+    required: false
+    description: Nullstone stack name (falls back to NULLSTONE_STACK env var)
+  app:
+    required: false
+    description: Nullstone app name, also used as the image tag (falls back to NULLSTONE_APP env var)
+  env:
+    required: false
+    description: Nullstone environment name (falls back to NULLSTONE_ENV env var)
+  dockerfile:
+    required: false
+    default: 'Dockerfile'
+    description: Path to the Dockerfile
+  context:
+    required: false
+    default: '.'
+    description: Docker build context
+  build-args:
+    required: false
+    default: ''
+    description: Newline-separated KEY=VALUE pairs passed as --build-arg
+  version:
+    required: false
+    default: ''
+    description: Label for the release (defaults to the commit SHA of the current repo)
+  unique:
+    required: false
+    default: 'false'
+    description: Always push the artifact with a unique version; appends an incrementing -<count> suffix if the version already exists
+  auto-approve:
+    required: false
+    default: 'false'
+    description: When 'true', pass --auto-approve to `nullstone release` to skip approvals on the infra-update (requires proper stack permissions)
+  wait:
+    required: false
+    default: 'false'
+    description: When 'true', pass --wait to `nullstone release` so the step blocks until the release completes
+  env-vars:
+    required: false
+    default: ''
+    description: Newline-separated KEY=VALUE pairs, each passed as --env-var to `nullstone release`
+outputs:
+  version:
+    description: The artifact version emitted by `nullstone push` on success
+    value: ${{ steps.push.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+      with:
+        ref: ${{ github.sha }}
+    - uses: docker/setup-buildx-action@v3
+    - uses: nullstone-io/setup-nullstone-action@v0
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - uses: docker/build-push-action@v6
+      with:
+        context: ${{ inputs.context }}
+        file: ${{ inputs.dockerfile }}
+        push: false
+        load: true
+        tags: ${{ inputs.app || env.NULLSTONE_APP }}
+        provenance: false
+        build-args: ${{ inputs.build-args }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    - name: Publish to Nullstone
+      id: push
+      shell: bash
+      env:
+        NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
+        NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
+        NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
+        VERSION: ${{ inputs.version }}
+        UNIQUE: ${{ inputs.unique }}
+      run: |
+        set -euo pipefail
+        flags=(--source="$NULLSTONE_APP")
+        [ -n "$VERSION" ] && flags+=(--version "$VERSION")
+        [ "$UNIQUE" = "true" ] && flags+=(--unique)
+        output="$(nullstone push "${flags[@]}")"
+        printf '%s\n' "$output"
+        version="$(printf '%s' "$output" | tail -n1)"
+        printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
+    - name: Release
+      shell: bash
+      env:
+        NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
+        NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
+        NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
+        VERSION: ${{ steps.push.outputs.version }}
+        AUTO_APPROVE: ${{ inputs.auto-approve }}
+        WAIT: ${{ inputs.wait }}
+        ENV_VARS: ${{ inputs.env-vars }}
+      run: |
+        flags=(--version "$VERSION")
+        [ "$AUTO_APPROVE" = "true" ] && flags+=(--auto-approve)
+        [ "$WAIT" = "true" ] && flags+=(--wait)
+        if [ -n "$ENV_VARS" ]; then
+          while IFS= read -r line; do
+            [ -n "$line" ] && flags+=(--env-var="$line")
+          done <<< "$ENV_VARS"
+        fi
+        nullstone release "${flags[@]}"

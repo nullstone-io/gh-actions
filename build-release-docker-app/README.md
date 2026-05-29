@@ -1,0 +1,86 @@
+# build-release-docker-app
+
+Composite action that builds a single app's container image with Buildx, pushes it to the Nullstone artifact registry, and then releases the app. Combines [`build-publish-docker-app`](../build-publish-docker-app/) and [`release-app`](../release-app/) into one step.
+
+A release runs an infra-update when there are outstanding workspace changes and deploys the newly-pushed version, producing the optimal path to make both infra and app code live.
+
+## Inputs
+
+| Input | Required | Default | Notes |
+| -- | -- | -- | -- |
+| `app` | yes | — | Nullstone app name (also used as the image tag) |
+| `dockerfile` | yes | — | Path to the Dockerfile |
+| `context` | no | `.` | Docker build context |
+| `build-args` | no | `''` | Newline-separated `KEY=VALUE` pairs passed as `--build-arg` |
+| `env` | yes | — | Target Nullstone environment |
+| `version` | no | `''` | Version label for the artifact (defaults to the commit SHA) |
+| `unique` | no | `'false'` | Always push with a unique version; appends `-<count>` if the version already exists |
+| `wait` | no | `'false'` | When `'true'`, passes `--wait` to `nullstone release` so the step blocks until the release completes |
+| `env-vars` | no | `''` | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to `nullstone release` |
+
+## Outputs
+
+| Output | Notes |
+| -- | -- |
+| `version` | Artifact version emitted by `nullstone push` on success |
+
+## Environment
+
+Reads `NULLSTONE_ORG`, `NULLSTONE_STACK`, and `NULLSTONE_API_KEY` from the workflow environment. See the [top-level README](../README.md#consumer-convention) for the convention.
+
+## Example
+
+```yaml
+build-release:
+  runs-on: ubuntu-latest
+  strategy:
+    fail-fast: false
+    matrix:
+      include:
+        - app: taco-api
+          dockerfile: ./Dockerfile
+        - app: taco-ui
+          dockerfile: ./ui/apps/web/Dockerfile
+          build-args: |
+            NEXT_PUBLIC_ENV=development
+            GIT_SHA=${{ github.sha }}
+  steps:
+    - uses: nullstone-io/gh-actions/build-release-docker-app@v1
+      with:
+        env: ${{ inputs.env }}
+        app: ${{ matrix.app }}
+        dockerfile: ${{ matrix.dockerfile }}
+        build-args: ${{ matrix.build-args }}
+```
+
+Note that `build-args` are consumed at image build time, while `env-vars` are applied to the
+release. To set runtime env vars on the release:
+
+```yaml
+steps:
+  - uses: nullstone-io/gh-actions/build-release-docker-app@v1
+    with:
+      env: ${{ inputs.env }}
+      app: taco-api
+      dockerfile: ./Dockerfile
+      env-vars: |
+        LOG_LEVEL=debug
+        FEATURE_FLAG=on
+        RELEASE_SHA=${{ github.sha }}
+```
+
+## Behavior
+
+1. Checks out the repo at `github.sha`.
+2. Sets up Docker Buildx and the Nullstone CLI.
+3. Builds the image locally (`load: true`, `push: false`) tagged as `${{ inputs.app }}`, with GHA layer caching (`type=gha`).
+4. Pushes to Nullstone via `nullstone push --source=<app>`, capturing the emitted version as the `version` output.
+5. Releases the app via `nullstone release --version <version>`, using the exact version emitted by step 4.
+
+## When to use this vs. the split actions
+
+Use this action when a single app's build, publish, and release run together in one job with no intervening steps (e.g., no separate IaC sync or DB migration job). When you need to fan out a publish step, run `iac-sync`, run migrations, and then release in a separate job, use [`build-publish-docker-app`](../build-publish-docker-app/) and [`release-app`](../release-app/) separately.
+
+## When to use this vs. `build-deploy-docker-app`
+
+Use [`build-deploy-docker-app`](../build-deploy-docker-app/) when you only need to build, publish, and deploy already-reconciled infra. Use `build-release-docker-app` when you want Nullstone to reconcile outstanding infra changes and the new app code in a single step.
