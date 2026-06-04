@@ -6,17 +6,18 @@ A release runs an infra-update when there are outstanding workspace changes and 
 
 ## Inputs
 
-| Input | Required | Default | Notes |
-| -- | -- | -- | -- |
-| `app` | yes | — | Nullstone app name (also used as the image tag) |
-| `dockerfile` | yes | — | Path to the Dockerfile |
-| `context` | no | `.` | Docker build context |
-| `build-args` | no | `''` | Newline-separated `KEY=VALUE` pairs passed as `--build-arg` |
-| `env` | yes | — | Target Nullstone environment |
-| `version` | no | `''` | Version label for the artifact (defaults to the commit SHA) |
-| `unique` | no | `'false'` | Always push with a unique version; appends `-<count>` if the version already exists |
-| `wait` | no | `'false'` | When `'true'`, passes `--wait` to `nullstone release` so the step blocks until the release completes |
-| `env-vars` | no | `''` | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to `nullstone release` |
+| Input          | Required  | Default    | Notes                                                                                                                                   |
+|----------------|-----------|------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| `app`          | yes       | —          | Nullstone app name (also used as the image tag)                                                                                         |
+| `dockerfile`   | yes       | —          | Path to the Dockerfile                                                                                                                  |
+| `context`      | no        | `.`        | Docker build context                                                                                                                    |
+| `build-args`   | no        | `''`       | Newline-separated `KEY=VALUE` pairs passed as `--build-arg`                                                                             |
+| `env`          | yes       | —          | Target Nullstone environment                                                                                                            |
+| `version`      | no        | `''`       | Version label for the artifact (defaults to the commit SHA)                                                                             |
+| `unique`       | no        | `'false'`  | Always push with a unique version; appends `-<count>` if the version already exists                                                     |
+| `auto-approve` | no        | `'false'`  | When `'true'`, passes `--auto-approve` to `nullstone release` to skip approvals on the infra-update (requires proper stack permissions) |
+| `wait`         | no        | `'false'`  | When `'true'`, passes `--wait` to `nullstone release` so the step blocks until the release completes                                    |
+| `env-vars`     | no        | `''`       | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to `nullstone release`                                                  |
 
 ## Outputs
 

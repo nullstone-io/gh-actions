@@ -4,9 +4,9 @@ Composite action that runs `nullstone iac test` to validate the IaC config (`.nu
 
 ## Inputs
 
-| Input | Required | Notes |
-| -- | -- | -- |
-| `env` | yes | Target Nullstone environment |
+| Input | Required | Notes                        |
+|-------|----------|------------------------------|
+| `env` | yes      | Target Nullstone environment |
 
 ## Environment
 

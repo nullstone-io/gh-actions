@@ -4,12 +4,12 @@ Composite action that deploys a single Nullstone app via `nullstone deploy`. Int
 
 ## Inputs
 
-| Input | Required | Default | Notes |
-| -- | -- | -- | -- |
-| `app` | yes | — | Nullstone app name |
-| `env` | yes | — | Target Nullstone environment |
-| `wait` | no | `'false'` | When `'true'`, passes `--wait` to `nullstone deploy` so the step blocks until the deployment completes |
-| `env-vars` | no | `''` | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to `nullstone deploy` |
+| Input      | Required | Default   | Notes                                                                                                  |
+|------------|----------|-----------|--------------------------------------------------------------------------------------------------------|
+| `app`      | yes      | —         | Nullstone app name                                                                                     |
+| `env`      | yes      | —         | Target Nullstone environment                                                                           |
+| `wait`     | no       | `'false'` | When `'true'`, passes `--wait` to `nullstone deploy` so the step blocks until the deployment completes |
+| `env-vars` | no       | `''`      | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to `nullstone deploy`                  |
 
 ## Environment
 

@@ -4,9 +4,11 @@ Composite action that runs `nullstone iac-sync` to reconcile Nullstone's IaC con
 
 ## Inputs
 
-| Input | Required | Notes |
-| -- | -- | -- |
-| `env` | yes | Target Nullstone environment |
+| Input        | Required  | Notes                                                                                                     |
+|--------------|-----------|-----------------------------------------------------------------------------------------------------------|
+| `env`        | yes       | Target Nullstone environment                                                                              |
+| `auto-plan`  | no        | Queue an infra-update Run on each workspace where IaC changes are detected (Run is left pending approval) |
+| `auto-apply` | no        | Auto-approve any infra-update Run created by the sync (implies `--auto-plan`)                             |
 
 ## Environment
 

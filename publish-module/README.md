@@ -4,9 +4,11 @@ Composite action that publishes a single Nullstone IaC module if its source file
 
 ## Inputs
 
-| Input | Required | Notes |
-| -- | -- | -- |
-| `dir` | yes | Path (relative to repo root) of the module — also doubles as the display label |
+| Input     | Required  | Notes                                                                                                                                                                                                         |
+|-----------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dir`     | yes       | Path (relative to repo root) of the module — also doubles as the display label                                                                                                                                |
+| `version` | no        | Semver version for the module, passed as `--version` (default `next-patch`). `'next-patch'` bumps the patch component of the latest version; `'next-build'` appends `+<build>` using the short Git commit SHA |
+| `if`      | no        | Only publish when the condition is met, passed as `--if`. `'checksum-changed'` skips publishing when the packaged tarball matches the latest published version                                                |
 
 ## Outputs
 

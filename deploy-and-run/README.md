@@ -4,13 +4,14 @@ Composite action that deploys a Nullstone app and then executes a follow-up comm
 
 ## Inputs
 
-| Input | Required | Notes |
-| -- | -- | -- |
-| `app` | yes | Nullstone app to deploy |
-| `command` | yes | Command passed to `nullstone run --app=<app>` |
-| `env` | yes | Target Nullstone environment |
-| `env-vars` | no | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to the `nullstone deploy` step |
-| `run-env-vars` | no | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to the `nullstone run` step |
+| Input          | Required | Notes                                                                                                 |
+|----------------|----------|-------------------------------------------------------------------------------------------------------|
+| `app`          | yes      | Nullstone app to deploy                                                                               |
+| `command`      | yes      | Command passed to `nullstone run --app=<app>`                                                         |
+| `env`          | yes      | Target Nullstone environment                                                                          |
+| `container`    | no       | Select a specific container within a task or pod, passed as `--container` to the `nullstone run` step |
+| `env-vars`     | no       | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to the `nullstone deploy` step        |
+| `run-env-vars` | no       | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to the `nullstone run` step           |
 
 ## Environment
 

@@ -4,12 +4,14 @@ Composite action that releases a single Nullstone app via `nullstone release`. A
 
 ## Inputs
 
-| Input | Required | Default | Notes |
-| -- | -- | -- | -- |
-| `app` | yes | — | Nullstone app name |
-| `env` | yes | — | Target Nullstone environment |
-| `wait` | no | `'false'` | When `'true'`, passes `--wait` to `nullstone release` so the step blocks until the release completes |
-| `env-vars` | no | `''` | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to `nullstone release` |
+| Input          | Required | Default   | Notes                                                                                                                                   |
+|----------------|----------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| `app`          | yes      | —         | Nullstone app name                                                                                                                      |
+| `env`          | yes      | —         | Target Nullstone environment                                                                                                            |
+| `version`      | no       | `''`      | Label for the release, passed as `--version` (defaults to the commit SHA of the current repo)                                           |
+| `auto-approve` | no       | `'false'` | When `'true'`, passes `--auto-approve` to `nullstone release` to skip approvals on the infra-update (requires proper stack permissions) |
+| `wait`         | no       | `'false'` | When `'true'`, passes `--wait` to `nullstone release` so the step blocks until the release completes                                    |
+| `env-vars`     | no       | `''`      | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to `nullstone release`                                                  |
 
 ## Environment
 

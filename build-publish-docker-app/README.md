@@ -4,13 +4,15 @@ Composite action that builds a single app's container image with Buildx and push
 
 ## Inputs
 
-| Input | Required | Default | Notes |
-| -- | -- | -- | -- |
-| `app` | yes | — | Nullstone app name (also used as the image tag) |
-| `dockerfile` | yes | — | Path to the Dockerfile |
-| `context` | no | `.` | Docker build context |
-| `build-args` | no | `''` | Newline-separated `KEY=VALUE` pairs passed as `--build-arg` |
-| `env` | yes | — | Target Nullstone environment |
+| Input         | Required | Default   | Notes                                                                                                                   |
+|---------------|----------|-----------|-------------------------------------------------------------------------------------------------------------------------|
+| `app`         | yes      | —         | Nullstone app name (also used as the image tag)                                                                         |
+| `dockerfile`  | yes      | —         | Path to the Dockerfile                                                                                                  |
+| `context`     | no       | `.`       | Docker build context                                                                                                    |
+| `build-args`  | no       | `''`      | Newline-separated `KEY=VALUE` pairs passed as `--build-arg`                                                             |
+| `env`         | yes      | —         | Target Nullstone environment                                                                                            |
+| `version`     | no       | `''`      | Label for the deployment, passed as `--version` (defaults to the commit SHA of the current repo)                        |
+| `unique`      | no       | `'false'` | Always push the artifact with a unique version; appends an incrementing `-<count>` suffix if the version already exists |
 
 ## Outputs
 
