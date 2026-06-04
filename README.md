@@ -13,6 +13,7 @@ Catalog of reusable composite GitHub Actions for assembling a Nullstone deploy p
 | [`iac-sync`](iac-sync/) | Run `nullstone iac-sync` for a target environment |
 | [`iac-test`](iac-test/) | Run `nullstone iac test` against a target environment (typically on pull requests) |
 | [`deploy-and-run`](deploy-and-run/) | Deploy a Nullstone app and execute a follow-up command (migrations, seeds, batch jobs) |
+| [`release-and-run`](release-and-run/) | Release a Nullstone app (infra-update + deploy) and execute a follow-up command (migrations, seeds, batch jobs) |
 | [`deploy-app`](deploy-app/) | Deploy a single Nullstone app via `nullstone deploy` |
 | [`release-app`](release-app/) | Release a single Nullstone app (infra-update + deploy) via `nullstone release` |
 
