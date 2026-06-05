@@ -1,6 +1,6 @@
 name: iac-sync
 author: nullstone-io
-description: Run `nullstone iac-sync` for a target environment
+description: Run `nullstone iac sync` for a target environment
 branding:
   icon: refresh-cw
   color: blue

@@ -1,6 +1,6 @@
 # iac-sync
 
-Composite action that runs `nullstone iac-sync` to reconcile Nullstone's IaC config (apps, capabilities, connections) with what's declared in the consumer's repo.
+Composite action that runs `nullstone iac sync` to reconcile Nullstone's IaC config (apps, capabilities, connections) with what's declared in the consumer's repo.
 
 ## Inputs
 
@@ -28,6 +28,6 @@ iac-sync:
 
 ## Behavior
 
-1. Checks out the repo (so `nullstone iac-sync` can read `.nullstone/` config).
+1. Checks out the repo (so `nullstone iac sync` can read `.nullstone/` config).
 2. Sets up the Nullstone CLI.
-3. Runs `nullstone iac-sync`. No-ops cleanly when there are no IaC changes to apply.
+3. Runs `nullstone iac sync`. No-ops cleanly when there are no IaC changes to apply.

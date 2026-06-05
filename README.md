@@ -10,7 +10,7 @@ Catalog of reusable composite GitHub Actions for assembling a Nullstone deploy p
 | [`build-publish-docker-app`](build-publish-docker-app/) | Build a single app's container image with Buildx and push it to the Nullstone artifact registry |
 | [`build-deploy-docker-app`](build-deploy-docker-app/) | Build, publish, and deploy a single app's container image in one step |
 | [`build-release-docker-app`](build-release-docker-app/) | Build, publish, and release (infra-update + deploy) a single app's container image in one step |
-| [`iac-sync`](iac-sync/) | Run `nullstone iac-sync` for a target environment |
+| [`iac-sync`](iac-sync/) | Run `nullstone iac sync` for a target environment |
 | [`iac-test`](iac-test/) | Run `nullstone iac test` against a target environment (typically on pull requests) |
 | [`deploy-and-run`](deploy-and-run/) | Deploy a Nullstone app and execute a follow-up command (migrations, seeds, batch jobs) |
 | [`release-and-run`](release-and-run/) | Release a Nullstone app (infra-update + deploy) and execute a follow-up command (migrations, seeds, batch jobs) |
