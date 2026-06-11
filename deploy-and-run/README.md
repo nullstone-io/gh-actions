@@ -69,7 +69,7 @@ db-migrate:
 
 1. Checks out the repo.
 2. Sets up the Nullstone CLI.
-3. Runs `nullstone deploy --app=<app>`.
+3. Runs `nullstone deploy --app=<app> --wait`. The `--wait` flag always blocks until the deploy completes, since the follow-up command must run against a fully deployed app.
 4. Runs `nullstone run --app=<app> <command>`.
 
 The action fails fast if the deploy step fails, so the run step only executes against a freshly deployed app.

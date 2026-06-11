@@ -22,10 +22,6 @@ inputs:
     required: false
     default: 'false'
     description: When 'true', pass --auto-approve to `nullstone release` to skip approvals on the infra-update (requires proper stack permissions)
-  wait:
-    required: false
-    default: 'false'
-    description: When 'true', pass --wait to `nullstone release` so the step blocks until the release completes
   command:
     required: true
     description: Command passed to `nullstone run` after the release
@@ -56,13 +52,11 @@ runs:
         NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
         VERSION: ${{ inputs.version }}
         AUTO_APPROVE: ${{ inputs.auto-approve }}
-        WAIT: ${{ inputs.wait }}
         ENV_VARS: ${{ inputs.env-vars }}
       run: |
-        flags=()
+        flags=(--wait)
         [ -n "$VERSION" ] && flags+=(--version "$VERSION")
         [ "$AUTO_APPROVE" = "true" ] && flags+=(--auto-approve)
-        [ "$WAIT" = "true" ] && flags+=(--wait)
         if [ -n "$ENV_VARS" ]; then
           while IFS= read -r line; do
             [ -n "$line" ] && flags+=(--env-var="$line")

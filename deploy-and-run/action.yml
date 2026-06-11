@@ -44,7 +44,7 @@ runs:
         NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
         ENV_VARS: ${{ inputs.env-vars }}
       run: |
-        flags=()
+        flags=(--wait)
         if [ -n "$ENV_VARS" ]; then
           while IFS= read -r line; do
             [ -n "$line" ] && flags+=(--env-var="$line")
