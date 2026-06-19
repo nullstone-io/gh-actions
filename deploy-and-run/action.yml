@@ -14,6 +14,10 @@ inputs:
   env:
     required: false
     description: Target Nullstone environment (falls back to NULLSTONE_ENV env var)
+  version:
+    required: false
+    default: ''
+    description: Version of the app artifact to deploy, passed as --version to the `nullstone deploy` step (defaults to the most recently pushed version)
   command:
     required: true
     description: Command passed to `nullstone run` after deployment
@@ -42,9 +46,11 @@ runs:
         NULLSTONE_STACK: ${{ inputs.stack || env.NULLSTONE_STACK }}
         NULLSTONE_APP: ${{ inputs.app || env.NULLSTONE_APP }}
         NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
+        VERSION: ${{ inputs.version }}
         ENV_VARS: ${{ inputs.env-vars }}
       run: |
         flags=(--wait)
+        [ -n "$VERSION" ] && flags+=(--version "$VERSION")
         if [ -n "$ENV_VARS" ]; then
           while IFS= read -r line; do
             [ -n "$line" ] && flags+=(--env-var="$line")

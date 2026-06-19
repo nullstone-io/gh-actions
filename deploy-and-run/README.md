@@ -9,6 +9,7 @@ Composite action that deploys a Nullstone app and then executes a follow-up comm
 | `app`          | yes      | Nullstone app to deploy                                                                               |
 | `command`      | yes      | Command passed to `nullstone run --app=<app>`                                                         |
 | `env`          | yes      | Target Nullstone environment                                                                          |
+| `version`      | no       | Version of the app artifact to deploy, passed as `--version` to the `nullstone deploy` step (defaults to the most recently pushed version) |
 | `container`    | no       | Select a specific container within a task or pod, passed as `--container` to the `nullstone run` step |
 | `env-vars`     | no       | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to the `nullstone deploy` step        |
 | `run-env-vars` | no       | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to the `nullstone run` step           |
@@ -69,7 +70,7 @@ db-migrate:
 
 1. Checks out the repo.
 2. Sets up the Nullstone CLI.
-3. Runs `nullstone deploy --app=<app> --wait`. The `--wait` flag always blocks until the deploy completes, since the follow-up command must run against a fully deployed app.
+3. Runs `nullstone deploy --app=<app> --wait` (adding `--version` when `version` is set). The `--wait` flag always blocks until the deploy completes, since the follow-up command must run against a fully deployed app.
 4. Runs `nullstone run --app=<app> <command>`.
 
 The action fails fast if the deploy step fails, so the run step only executes against a freshly deployed app.

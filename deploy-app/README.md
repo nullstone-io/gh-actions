@@ -8,6 +8,7 @@ Composite action that deploys a single Nullstone app via `nullstone deploy`. Int
 |------------|----------|-----------|--------------------------------------------------------------------------------------------------------|
 | `app`      | yes      | —         | Nullstone app name                                                                                     |
 | `env`      | yes      | —         | Target Nullstone environment                                                                           |
+| `version`  | no       | `''`      | Version of the app artifact to deploy, passed as `--version` (defaults to the most recently pushed version) |
 | `wait`     | no       | `'false'` | When `'true'`, passes `--wait` to `nullstone deploy` so the step blocks until the deployment completes |
 | `env-vars` | no       | `''`      | Newline-separated `KEY=VALUE` pairs, each passed as `--env-var` to `nullstone deploy`                  |
 
