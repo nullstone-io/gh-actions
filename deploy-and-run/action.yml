@@ -19,8 +19,9 @@ inputs:
     default: ''
     description: Version of the app artifact to deploy, passed as --version to the `nullstone deploy` step (defaults to the most recently pushed version)
   command:
-    required: true
-    description: Command passed to `nullstone run` after deployment
+    required: false
+    default: ''
+    description: Command passed to `nullstone run` after deployment (defaults to the container's default command)
   container:
     required: false
     default: ''
@@ -65,6 +66,7 @@ runs:
         NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
         CONTAINER: ${{ inputs.container }}
         ENV_VARS: ${{ inputs.run-env-vars }}
+        COMMAND: ${{ inputs.command }}
       run: |
         flags=()
         [ -n "$CONTAINER" ] && flags+=(--container "$CONTAINER")
@@ -73,4 +75,8 @@ runs:
             [ -n "$line" ] && flags+=(--env-var "$line")
           done <<< "$ENV_VARS"
         fi
-        nullstone run "${flags[@]}" -- ${{ inputs.command }}
+        if [ -n "$COMMAND" ]; then
+          nullstone run "${flags[@]}" -- $COMMAND
+        else
+          nullstone run "${flags[@]}"
+        fi

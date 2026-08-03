@@ -23,8 +23,9 @@ inputs:
     default: 'false'
     description: When 'true', pass --auto-approve to `nullstone release` to skip approvals on the infra-update (requires proper stack permissions)
   command:
-    required: true
-    description: Command passed to `nullstone run` after the release
+    required: false
+    default: ''
+    description: Command passed to `nullstone run` after the release (defaults to the container's default command)
   container:
     required: false
     default: ''
@@ -71,6 +72,7 @@ runs:
         NULLSTONE_ENV: ${{ inputs.env || env.NULLSTONE_ENV }}
         CONTAINER: ${{ inputs.container }}
         ENV_VARS: ${{ inputs.run-env-vars }}
+        COMMAND: ${{ inputs.command }}
       run: |
         flags=()
         [ -n "$CONTAINER" ] && flags+=(--container "$CONTAINER")
@@ -79,4 +81,8 @@ runs:
             [ -n "$line" ] && flags+=(--env-var "$line")
           done <<< "$ENV_VARS"
         fi
-        nullstone run "${flags[@]}" -- ${{ inputs.command }}
+        if [ -n "$COMMAND" ]; then
+          nullstone run "${flags[@]}" -- $COMMAND
+        else
+          nullstone run "${flags[@]}"
+        fi

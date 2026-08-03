@@ -7,7 +7,7 @@ Composite action that releases a Nullstone app (infra-update + deploy) and then 
 | Input          | Required | Default   | Notes                                                                                                                                   |
 |----------------|----------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | `app`          | yes      | —         | Nullstone app to release                                                                                                                |
-| `command`      | yes      | —         | Command passed to `nullstone run --app=<app>` after the release                                                                         |
+| `command`      | no       | `''`      | Command passed to `nullstone run --app=<app>` after the release (defaults to the container's default command)                            |
 | `env`          | yes      | —         | Target Nullstone environment                                                                                                            |
 | `version`      | no       | `''`      | Label for the release, passed as `--version` (defaults to the commit SHA of the current repo)                                           |
 | `auto-approve` | no       | `'false'` | When `'true'`, passes `--auto-approve` to `nullstone release` to skip approvals on the infra-update (requires proper stack permissions) |
@@ -60,7 +60,7 @@ db-migrate:
 1. Checks out the repo.
 2. Sets up the Nullstone CLI.
 3. Runs `nullstone release --app=<app> --wait` (infra-update when there are outstanding workspace changes, deploy when the app version has changed). The `--wait` flag always blocks until the release completes, since the follow-up command must run against a fully released app.
-4. Runs `nullstone run --app=<app> <command>`.
+4. Runs `nullstone run --app=<app> <command>`. When `command` is omitted, runs `nullstone run --app=<app>` and the container's default command is used.
 
 The action fails fast if the release step fails, so the run step only executes against a freshly released app.
 
